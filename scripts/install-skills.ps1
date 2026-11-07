@@ -1,13 +1,16 @@
 # PowerShell script to install skills to local agent harness directories:
-#   - ~/.agents/skills (for Codex, Antigravity, and Agent Skills compatible tools)
+#   - ~/.gemini/config/skills (for Antigravity global discovery across all projects)
+#   - ~/.agents/skills (for Codex and Agent Skills compatible tools)
 #   - ~/.claude/skills (for Claude Code)
 
 [CmdletBinding()]
 param(
     [string[]]$Destinations = @(
+        "$env:USERPROFILE\.gemini\config\skills",
         "$env:USERPROFILE\.agents\skills",
         "$env:USERPROFILE\.claude\skills"
     ),
+    [string]$ProjectDir,
     [switch]$IncludeInProgress
 )
 
@@ -47,6 +50,28 @@ foreach ($dest in $Destinations) {
         }
         Copy-Item -Path $skillDir.FullName -Destination $targetDir -Recurse -Force
         Write-Host "  Installed: $($skillDir.Name)" -ForegroundColor Gray
+    }
+}
+
+if ($ProjectDir) {
+    if (Test-Path $ProjectDir) {
+        $projAgents = Join-Path $ProjectDir ".agents"
+        if (-not (Test-Path $projAgents)) {
+            New-Item -ItemType Directory -Path $projAgents -Force | Out-Null
+        }
+        $projSkillsJson = Join-Path $projAgents "skills.json"
+        $configContent = @"
+{
+  "entries": [
+    { "path": "$($RepoRoot -replace '\\', '/')/skills/engineering" },
+    { "path": "$($RepoRoot -replace '\\', '/')/skills/productivity" }
+  ]
+}
+"@
+        Set-Content -Path $projSkillsJson -Value $configContent -Encoding UTF8
+        Write-Host "`nConfigured project workspace at: $ProjectDir (.agents\skills.json)" -ForegroundColor Green
+    } else {
+        Write-Warning "Project directory '$ProjectDir' not found."
     }
 }
 

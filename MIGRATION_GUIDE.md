@@ -37,8 +37,14 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install-skills.ps1 -IncludeIn
 ```
 
 * 作用：將 35 個 Skills 完整複製至：
-  * `C:\Users\<使用者名稱>\.agents\skills\`（供 Antigravity、Codex 及 Agent Skills 標準工具讀取）
+  * `C:\Users\<使用者名稱>\.gemini\config\skills\`（Antigravity 全域目錄，任何專案皆可直接使用斜線指令）
+  * `C:\Users\<使用者名稱>\.agents\skills\`（供 Codex 及 Agent Skills 標準工具讀取）
   * `C:\Users\<使用者名稱>\.claude\skills\`（供 Claude Code 本地讀取）
+
+若要為特定其他專案（例如 JAV 專案）獨立配置 `.agents/skills.json`，可附加 `-ProjectDir` 參數：
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-skills.ps1 -ProjectDir "D:\Workspace\JAV" -IncludeInProgress
+```
 
 ### B. macOS / Linux 環境 (Bash)
 
